@@ -1,3 +1,7 @@
+**MVP Scope (Frozen):
+Python-based code execution with syntax-based language detection, dependency intent inference, pre-validated environment selection, and secure sandboxed execution.**
+
+
 # React + TypeScript + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
