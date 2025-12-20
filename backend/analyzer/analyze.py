@@ -1,36 +1,35 @@
 def analyze_code(code: str):
     code_lower = code.lower()
 
-    # -------- Language Detection --------
-    python_indicators = [
-        "def ",
-        "import ",
-        "print(",
-        "for ",
-        "while ",
-        "range(",
-        "if ",
-        "elif ",
-        "else:",
-        ":"
-    ]
-
-    if any(tok in code_lower for tok in python_indicators):
-        language = "python"
-    elif "#include" in code_lower:
-        language = "cpp"
+    # -------- Language Detection (C FIRST) --------
+    if "#include" in code_lower or "int main" in code_lower:
+        language = "c"
     else:
-        language = "unknown"
+        python_indicators = [
+            "def ",
+            "import ",
+            "print(",
+            "range(",
+            "elif ",
+            "else:",
+        ]
+        if any(tok in code_lower for tok in python_indicators):
+            language = "python"
+        else:
+            language = "unknown"
 
     # -------- Framework Detection --------
     framework = "base"
-    if "torch" in code_lower or "tensorflow" in code_lower or "numpy" in code_lower:
+    if language == "python" and any(
+        lib in code_lower for lib in ["torch", "tensorflow", "numpy"]
+    ):
         framework = "ml"
 
     # -------- Risk Detection --------
     dangerous_keywords = [
         "os.system",
         "subprocess",
+        
         "rm -rf",
         "fork",
         "sys.exit",
@@ -38,8 +37,13 @@ def analyze_code(code: str):
 
     risk = "high" if any(k in code_lower for k in dangerous_keywords) else "low"
 
-    # -------- Execution Profile --------
-    execution_profile = f"{framework}-basic"
+    # -------- Execution Profile Selection --------
+    if language == "c":
+        execution_profile = "c-basic"
+    elif framework == "ml":
+        execution_profile = "ml-basic"
+    else:
+        execution_profile = "base-basic"
 
     return {
         "language": language,
